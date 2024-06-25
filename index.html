@@ -26,6 +26,7 @@
         }
         main {
             max-width: 800px;
+            width: 90%;
             margin: 20px;
             padding: 20px;
             background-color: #1a1a1a;
@@ -53,6 +54,21 @@
         .app-link:hover {
             background-color: #00cc33;
         }
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        @media (min-width: 600px) {
+            .app-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+            }
+            .app-link {
+                width: 45%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -62,9 +78,12 @@
     <main>
         <h2>Welcome to the Digital Realm of NitsuaFox</h2>
         <p>In the neon-lit alleys of cyberspace, NitsuaFox emerges as a legendary coder, a digital alchemist who transforms lines of code into mesmerizing experiences. With an eye for the intricate and a taste for the unconventional, NitsuaFox crafts web apps that are not just tools but portals to an underground world of endless possibilities. Prepare to dive deep into the matrix.</p>
-        <a href="https://nitsuafox.github.io/Snake/snake.html" class="app-link">Play Snake Game</a>
-        <a href="https://nitsuafox.github.io/FIVES-ODDS-AND-EVENS/FOE.html" class="app-link">Play FIVES ODDS AND EVENS</a>
-        <!-- Add more links here -->
+        <div class="app-container">
+            <a href="https://nitsuafox.github.io/Snake/snake.html" class="app-link">Play Snake Game</a>
+            <a href="https://nitsuafox.github.io/FIVES-ODDS-AND-EVENS/FOE.html" class="app-link">Play FIVES ODDS AND EVENS</a>
+            <a href="https://nitsuafox.github.io/FIVES-ODDS-AND-EVENS/FOE-MOBILE.html" class="app-link">Play FIVES ODDS AND EVENS (Mobile)</a>
+            <!-- Add more links here -->
+        </div>
     </main>
 </body>
 </html>

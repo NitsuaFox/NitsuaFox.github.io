@@ -16,7 +16,7 @@
             width: 100%;
             height: 100vh;
         }
-        #score {
+        #message {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -31,49 +31,88 @@
             font-size: 30px;
             color: red;
         }
+        #mobileControls {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .control-button {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            line-height: 50px;
+            font-size: 30px;
+            border-radius: 50%;
+            margin: 0 10px;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
-    <div id="score">Type your statement: </div>
+    <div id="message">Type your statement: </div>
     <div id="gameOver">Game Over! You typed "MINOR".</div>
     <canvas id="gameCanvas"></canvas>
+    <div id="mobileControls">
+        <div id="leftButton" class="control-button">A</div>
+        <div id="rightButton" class="control-button">B</div>
+        <div id="spaceButton" class="control-button">Space</div>
+    </div>
     <script>
-        const statement = "I'm here to apologize and take responsibility. I should have never entertained these conversations. This was stupid.";
+        const statement = "I'm here to apologize and take responsibility. I should have never entertained these conversations. This was stupid. I get it, I'm not perfect. I'm a human, and I'll own my mistakes. But let's not get it twisted, I'm not a predator or anything like that. If you think so, get the fuck outta here.";
         let currentIndex = 0;
         let gameOver = false;
+        const forbiddenWord = "MINOR";
+        let typedText = "";
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
+        const leftButton = document.getElementById('leftButton');
+        const rightButton = document.getElementById('rightButton');
+        const spaceButton = document.getElementById('spaceButton');
+
+        leftButton.addEventListener('touchstart', () => typeLetter('A'));
+        rightButton.addEventListener('touchstart', () => typeLetter('B'));
+        spaceButton.addEventListener('touchstart', () => typeLetter(' '));
+
         document.addEventListener('keydown', (e) => {
             if (gameOver) return;
+            typeLetter(e.key);
+        });
 
-            const typedChar = String.fromCharCode(e.keyCode).toUpperCase();
-            const expectedChar = statement[currentIndex].toUpperCase();
+        function typeLetter(letter) {
+            if (gameOver) return;
 
-            if (typedChar === expectedChar) {
-                currentIndex++;
-                document.getElementById('score').innerText = `Type your statement: ${statement.slice(0, currentIndex)}`;
-            } else if (typedChar === 'M' && statement.slice(currentIndex, currentIndex + 5).toUpperCase() === 'MINOR') {
+            typedText += letter;
+
+            if (typedText.slice(-forbiddenWord.length).toUpperCase() === forbiddenWord) {
                 document.getElementById('gameOver').style.display = 'block';
                 gameOver = true;
+                return;
+            }
+
+            if (statement[currentIndex].toUpperCase() === letter.toUpperCase()) {
+                currentIndex++;
+                document.getElementById('message').innerText = `Type your statement: ${statement.slice(0, currentIndex)}`;
             }
 
             if (currentIndex >= statement.length) {
-                document.getElementById('score').innerText = 'Statement completed successfully!';
+                document.getElementById('message').innerText = 'Statement completed successfully!';
+                gameOver = true;
             }
-        });
+        }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (!gameOver) {
-                ctx.font = '20px Arial';
-                ctx.fillStyle = 'white';
-                ctx.fillText(`Typing: ${statement.slice(0, currentIndex)}`, 10, 50);
-            }
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText(`Typing: ${statement.slice(0, currentIndex)}`, 10, 50);
 
             requestAnimationFrame(draw);
         }

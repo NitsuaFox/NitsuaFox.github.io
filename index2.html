@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dr. Disrespect: The Redemption Run</title>
+    <title>Dr. Disrespect: Avoid the Word</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             font-family: Arial, sans-serif;
             background-color: #2c2c2c;
+            color: white;
         }
         #gameCanvas {
             display: block;
-            background-color: #2c2c2c;
+            background-color: #1e1e1e;
             width: 100%;
             height: 100vh;
         }
@@ -19,123 +20,65 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            color: white;
             font-size: 20px;
         }
-        .control-button {
+        #gameOver {
+            display: none;
             position: absolute;
-            bottom: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: rgba(255, 255, 255, 0.5);
-            text-align: center;
-            line-height: 50px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 30px;
-            border-radius: 50%;
-            user-select: none;
-        }
-        #leftButton {
-            left: 20px;
-        }
-        #rightButton {
-            right: 20px;
+            color: red;
         }
     </style>
 </head>
 <body>
-    <div id="score">Score: 0</div>
+    <div id="score">Type your statement: </div>
+    <div id="gameOver">Game Over! You typed "MINOR".</div>
     <canvas id="gameCanvas"></canvas>
-    <div id="leftButton" class="control-button">&#8592;</div>
-    <div id="rightButton" class="control-button">&#8594;</div>
     <script>
+        const statement = "I'm here to apologize and take responsibility. I should have never entertained these conversations. This was stupid.";
+        let currentIndex = 0;
+        let gameOver = false;
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        let characterX = canvas.width / 2 - 25;
-        const characterY = canvas.height - 100;
-        const characterWidth = 50;
-        const characterHeight = 50;
-        let score = 0;
-        let leftPressed = false;
-        let rightPressed = false;
+        document.addEventListener('keydown', (e) => {
+            if (gameOver) return;
 
-        document.getElementById('leftButton').addEventListener('touchstart', () => { leftPressed = true; });
-        document.getElementById('leftButton').addEventListener('touchend', () => { leftPressed = false; });
-        document.getElementById('rightButton').addEventListener('touchstart', () => { rightPressed = true; });
-        document.getElementById('rightButton').addEventListener('touchend', () => { rightPressed = false; });
+            const typedChar = String.fromCharCode(e.keyCode).toUpperCase();
+            const expectedChar = statement[currentIndex].toUpperCase();
 
-        class Item {
-            constructor(x, y, type) {
-                this.x = x;
-                this.y = y;
-                this.type = type; // 'positive' or 'negative'
-                this.width = 30;
-                this.height = 30;
-                this.speed = 5;
+            if (typedChar === expectedChar) {
+                currentIndex++;
+                document.getElementById('score').innerText = `Type your statement: ${statement.slice(0, currentIndex)}`;
+            } else if (typedChar === 'M' && statement.slice(currentIndex, currentIndex + 5).toUpperCase() === 'MINOR') {
+                document.getElementById('gameOver').style.display = 'block';
+                gameOver = true;
             }
 
-            draw() {
-                ctx.fillStyle = this.type === 'positive' ? 'green' : 'red';
-                ctx.fillRect(this.x, this.y, this.width, this.height);
+            if (currentIndex >= statement.length) {
+                document.getElementById('score').innerText = 'Statement completed successfully!';
             }
+        });
 
-            update() {
-                this.y += this.speed;
-                this.draw();
-            }
-        }
-
-        const items = [];
-
-        function spawnItem() {
-            const x = Math.random() * (canvas.width - 30);
-            const type = Math.random() > 0.5 ? 'positive' : 'negative';
-            items.push(new Item(x, 0, type));
-        }
-
-        function drawCharacter() {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(characterX, characterY, characterWidth, characterHeight);
-        }
-
-        function update() {
+        function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (leftPressed && characterX > 0) characterX -= 5;
-            if (rightPressed && characterX < canvas.width - characterWidth) characterX += 5;
+            if (!gameOver) {
+                ctx.font = '20px Arial';
+                ctx.fillStyle = 'white';
+                ctx.fillText(`Typing: ${statement.slice(0, currentIndex)}`, 10, 50);
+            }
 
-            drawCharacter();
-
-            items.forEach((item, index) => {
-                item.update();
-
-                if (
-                    item.y + item.height > characterY &&
-                    item.x < characterX + characterWidth &&
-                    item.x + item.width > characterX
-                ) {
-                    if (item.type === 'positive') {
-                        score += 10;
-                    } else {
-                        score -= 10;
-                    }
-                    items.splice(index, 1);
-                }
-
-                if (item.y > canvas.height) {
-                    items.splice(index, 1);
-                }
-            });
-
-            document.getElementById('score').innerText = `Score: ${score}`;
-
-            requestAnimationFrame(update);
+            requestAnimationFrame(draw);
         }
 
-        setInterval(spawnItem, 1000);
-        update();
+        draw();
     </script>
 </body>
 </html>
